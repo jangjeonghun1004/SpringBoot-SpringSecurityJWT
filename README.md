@@ -1,7 +1,64 @@
+# JwtProvider
+package com.example.demo.util;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+
+@Component
+public class JwtProvider {
+    private final SecretKey secretKey;
+    private final long expirationMillis;
+
+    public JwtProvider(@Value("${jwt.secret}") String secret, @Value("${jwt.expirationMillis}") long expirationMillis) {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.expirationMillis = expirationMillis;
+    }
+
+    public String generateToken(String subject) {
+        return Jwts.builder()
+                .subject(subject)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expirationMillis))
+                .signWith(secretKey)
+                .compact();
+    }
+
+    public String extractUsername(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}
+
+
+
 # 프로세스 흐름
     1. 인증: 아이디 및 비밀번호 검증 
     2. 토큰 생성: TokenProvider
     3. 요청시 마다 토큰 검증: Token Provider
+
+
 
 # JWT(JSON Web Token)
 
