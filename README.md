@@ -1,3 +1,8 @@
+# 프로세스 흐름
+    1. 인증: 아이디 및 비밀번호 검증 
+    2. 토큰 생성: TokenProvider
+    3. 요청시 마다 토큰 검증: Token Provider
+
 # JWT(JSON Web Token)
 
     JWT(JSON Web Token)은 정보를 JSON 형태로 안전하게 전송하기 위한 토큰입니다.
